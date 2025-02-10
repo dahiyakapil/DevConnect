@@ -1,0 +1,25 @@
+{
+  "name": "devconnect",
+  "version": "1.0.0",
+  "description": "This project is about where developers can connect with other developers",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/nidex.js",
+    "server": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Node.js",
+    "JavaScript",
+    "Express.js",
+    "MongoDB",
+    "jwt",
+    "dotenv"
+  ],
+  "author": "Kapil",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
