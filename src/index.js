@@ -5,26 +5,39 @@ const PORT = process.env.PORT || 4000;
 
 
 
-app.use("/user", (req, res) => {
-    res.send("Route Order Matters !!!")
-})
+//^ Route paths based on string patterns Advance Routing using wildcard characters dynamic and flexible routing
 
-app.get("/user", (req, res) => {
+
+// in ? : abc, ac --> b is optional here
+app.get("/ab?c", (req, res) => {
     res.send({ "firstName": "Kapil", "lastName": "Dahiya" });
 })
 
-app.post("/user", (req, res) => {
-    res.send("User data saved to the databse successfully!")
+// abc, abbbbc, b is must ... abcc(not work)
+app.get("/ab+c", (req, res) => {
+    res.send({ "firstName": "Kapil", "lastName": "Dahiya" });
 })
 
-app.delete("/user", (req, res) => {
-    res.send("User data deleted successfully!")
+// abcd, abKAPILcd 
+app.get("/ab*cd", (req, res) => {
+    res.send({ "firstName": "Kapil", "lastName": "Dahiya" });
 })
 
-app.put("/user", (req, res) => {
-    res.send("User data updated Successfully !!!")
+
+//^ Route paths based on regular expressions
+
+// It will check if a is there in the url or not if not present then it will throw the error
+// http://localhost:4000/mango
+app.get(/a/, (req, res) => {
+    res.send({ "firstName": "Kapil", "lastName": "Dahiya" });
 })
 
+
+// in this url anything can come before fly.. but fly should be there then it will work.... and writing anything after fly1 it will throw error
+// http://localhost:4000/bKAPILcdafly
+app.get(/.*fly$/, (req, res) => {
+    res.send({ "firstName": "Kapil", "lastName": "Dahiya" });
+})
 
 
 app.listen(PORT, () => {
