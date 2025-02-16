@@ -7,15 +7,19 @@ import User from "./models/user.models.js";
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+app.use(express.json())
+
 app.post("/signup", async (req, res) => {
-    const user = new User({
-        firstName: "Kapil",
-        lastName: "Dahiya",
-        email: "kap@gmail.com",
-        password: "ekrnfefkeel",
-        age: 24,
-        gender: "male"
-    })
+    console.log(req.body)
+    const user = new User(req.body)
+
+    // it is same to the req.body as req.body will also be a object using express.json will read the json
+    // const user = new User({
+    //     firstName: "Kapil",
+    //     lastName: "Dahiya",
+    //     email: "kap@gmail.com",
+    //     password: "ekrnfefkeel",
+    // })
 
     try {
         await user.save();
