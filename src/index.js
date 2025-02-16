@@ -1,24 +1,37 @@
+import dotenv from "dotenv"
+dotenv.config()
 import express from "express";
+import { connectDB } from "./config/connectDB.js";
+import User from "./models/user.models.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+app.post("/signup", async (req, res) => {
+    const user = new User({
+        firstName: "Kapil",
+        lastName: "Dahiya",
+        email: "kap@gmail.com",
+        password: "ekrnfefkeel",
+        age: 24,
+        gender: "male"
+    })
 
-//^ Middlewares and Error Handlers
-
-//& Route Handlers
-
-app.use("/user", (req, res, next) => {
-    console.log("Route Handler -> 1")
-    next();
-    // res.send("Response 1")
-
-}, (req, res, next) => {
-    console.log("Route Handler -> 2")
-    res.send("Response 2")
-    next();
+    try {
+        await user.save();
+        res.send("User created succefully")
+    } catch (error) {
+        res.status(404).send("Error in creating the user")
+    }
 })
 
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`)
-})
+connectDB()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server is running at http://localhost:${PORT}`)
+        })
+    })
+    .catch((error) => {
+        console.log("MONGO db Connection failed !!!", error)
+    })
+
