@@ -1,6 +1,3 @@
-
-
-
 import mongoose from "mongoose"
 
 const userSchema = new mongoose.Schema({
@@ -9,9 +6,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         minLength: 3,
         maxLength: 50,
+        trim: true
     },
     lastName: {
         type: String,
+        trim: true
     },
     email: {
         type: String,
@@ -23,6 +22,20 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+        trim:true,
+        validate: {
+            validator: function (value) {
+                return (
+                    value.length >= 8 &&
+                    /[A-Z]/.test(value) &&
+                    /[a-z]/.test(value) &&
+                    /[0-9]/.test(value) &&
+                    /[!@#$%^&*]/.test(value)
+                );
+            },
+            message:
+                "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+        },
     },
     age: {
         type: Number,

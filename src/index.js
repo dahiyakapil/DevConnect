@@ -3,7 +3,8 @@ dotenv.config()
 import express from "express";
 import { connectDB } from "./config/connectDB.js";
 import User from "./models/user.models.js";
-import { ReturnDocument } from "mongodb";
+import validator from "validator"
+
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -13,21 +14,23 @@ app.use(express.json())
 app.post("/signup", async (req, res) => {
     console.log(req.body)
     const user = new User(req.body)
-
-    // it is same to the req.body as req.body will also be a object using express.json will read the json
-    // const user = new User({
-    //     firstName: "Kapil",
-    //     lastName: "Dahiya",
-    //     email: "kap@gmail.com",
-    //     password: "ekrnfefkeel",
-    // })
-
     try {
+
+        // 1. Required Fields Check
+        if (!user?.firstName || !user?.lastName || !user?.email || !user?.password) {
+            throw new Error("All fields are required");
+        }
+
+         // 2. Validate Email Format
+         if (!validator.isEmail(user.email)) {
+            throw new Error("Invalid email format");
+        }
+
         await user.save();
         res.status(201).json({ message: "User created successfully", user });
 
     } catch (error) {
-        res.status(404).send("Error in creating the user")
+        res.status(404).send("Error in creating the user: " + error.message)
     }
 })
 
@@ -114,11 +117,27 @@ app.patch("/user/:id", async (req, res) => {
     const userId = req.params.id;
     const data = req.body;
     try {
-        const user = await User.findByIdAndUpdate(userId , data, { returnDocument: "after", runValidators: true} );
+
+        // API Level Validation
+        const ALLOWED_UPDATES = ["photourl", "age", "gender", "skills"];
+
+        const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_UPDATES.includes(k));
+
+        if (!isUpdateAllowed) {
+            throw new Error("Update Not Allowed");
+        }
+
+        // Minimum Skills validation
+        if (data?.skills.length > 10) {
+            throw new Error("Skills can not be more than 10")
+        }
+
+
+        const user = await User.findByIdAndUpdate(userId, data, { returnDocument: "after", runValidators: true });
         console.log(user)
         res.send("User Updated Successfully")
     } catch (error) {
-        res.status(500).send("Update API FAILED" + error.message);
+        res.status(500).send("Update API FAILED: " + error.message);
     }
 })
 
