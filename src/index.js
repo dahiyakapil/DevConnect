@@ -99,26 +99,26 @@ app.delete("/user/:id", async (req, res) => {
 
 // Update API
 
-app.patch("/user", async (req, res) => {
-    const userId = req.body.userId;
-    const data = req.body;
-    try {
-        const user = await User.findByIdAndUpdate({ _id: userId }, data, { returnDocument: "after" });
-        console.log(user)
-        res.send("User Updated Successfully")
-    } catch (error) {
-        res.status(500).send("Something went wrong");
-    }
-})
+// app.patch("/user", async (req, res) => {
+//     const userId = req.body.userId;
+//     const data = req.body;
+//     try {
+//         const user = await User.findByIdAndUpdate({ _id: userId }, data, { returnDocument: "after" });
+//         console.log(user)
+//         res.send("User Updated Successfully")
+//     } catch (error) {
+//         res.status(500).send("Something went wrong");
+//     }
+// })
 app.patch("/user/:id", async (req, res) => {
     const userId = req.params.id;
     const data = req.body;
     try {
-        const user = await User.findByIdAndUpdate(userId , data, { returnDocument: "after" });
+        const user = await User.findByIdAndUpdate(userId , data, { returnDocument: "after", runValidators: true} );
         console.log(user)
         res.send("User Updated Successfully")
     } catch (error) {
-        res.status(500).send("Something went wrong");
+        res.status(500).send("Update API FAILED" + error.message);
     }
 })
 
