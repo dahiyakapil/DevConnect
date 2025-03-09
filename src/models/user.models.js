@@ -1,9 +1,10 @@
 import mongoose from "mongoose"
+import validator from "validator"
 
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        required: true,
+        required: [true, "First name is required"],
         minLength: 3,
         maxLength: 50,
         trim: true
@@ -17,12 +18,17 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         lowercase: true,
-        required: true
+        required: [true, "Email is required"],
+        validate(value) {
+            if (!validator.isEmail(value)) {
+                throw new Error("Invalid Email address" + value)
+            }
+        }
     },
     password: {
         type: String,
-        required: true,
-        trim:true,
+        required: [true, "Password is required"],
+        trim: true,
         validate: {
             validator: function (value) {
                 return (
@@ -51,7 +57,13 @@ const userSchema = new mongoose.Schema({
     },
     photoUrl: {
         type: String,
-        default: "https://w0.peakpx.com/wallpaper/16/683/HD-wallpaper-elon-musk-love-sayings-saying-feelings-unique-attitude.jpg"
+        default: "https://w0.peakpx.com/wallpaper/16/683/HD-wallpaper-elon-musk-love-sayings-saying-feelings-unique-attitude.jpg",
+        trim: true,
+        validate(value) {
+            if (!validator.isURL(value)) {
+                throw new Error("Invalid URL -> " + value)
+            }
+        }
     },
     about: {
         type: String,

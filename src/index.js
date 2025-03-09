@@ -16,16 +16,6 @@ app.post("/signup", async (req, res) => {
     const user = new User(req.body)
     try {
 
-        // 1. Required Fields Check
-        if (!user?.firstName || !user?.lastName || !user?.email || !user?.password) {
-            throw new Error("All fields are required");
-        }
-
-         // 2. Validate Email Format
-         if (!validator.isEmail(user.email)) {
-            throw new Error("Invalid email format");
-        }
-
         await user.save();
         res.status(201).json({ message: "User created successfully", user });
 
@@ -119,7 +109,7 @@ app.patch("/user/:id", async (req, res) => {
     try {
 
         // API Level Validation
-        const ALLOWED_UPDATES = ["photourl", "age", "gender", "skills"];
+        const ALLOWED_UPDATES = ["photoUrl", "age", "gender", "skills"];
 
         const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_UPDATES.includes(k));
 
@@ -135,7 +125,8 @@ app.patch("/user/:id", async (req, res) => {
 
         const user = await User.findByIdAndUpdate(userId, data, { returnDocument: "after", runValidators: true });
         console.log(user)
-        res.send("User Updated Successfully")
+        res.status(200).json({ message: "User updated successfully", user });
+
     } catch (error) {
         res.status(500).send("Update API FAILED: " + error.message);
     }
