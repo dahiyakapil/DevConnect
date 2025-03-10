@@ -3,8 +3,8 @@ dotenv.config()
 import express from "express";
 import { connectDB } from "./config/connectDB.js";
 import User from "./models/user.models.js";
-import validator from "validator"
-
+import { validateSignupData } from "./utils/validation.js";
+import bcrypt from "bcrypt"
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -12,9 +12,24 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json())
 
 app.post("/signup", async (req, res) => {
-    console.log(req.body)
-    const user = new User(req.body)
+
     try {
+
+        // Validation of data
+        validateSignupData(req);
+
+        // Encrypt the password
+        const { firstName, lastName, email, password } = req.body;
+
+        const passwordHash = await bcrypt.hash(password, 10); // returns a promise
+        console.log(passwordHash)
+
+
+
+
+        const user = new User({ firstName, lastName, email, password: passwordHash });
+        // const {firstName , lastName, email, password} = req.body;
+
 
         await user.save();
         res.status(201).json({ message: "User created successfully", user });
