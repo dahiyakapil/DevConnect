@@ -5,6 +5,7 @@ import { connectDB } from "./config/connectDB.js";
 import User from "./models/user.models.js";
 import { validateSignupData } from "./utils/validation.js";
 import bcrypt from "bcrypt"
+import validator from "validator"
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -24,9 +25,6 @@ app.post("/signup", async (req, res) => {
         const passwordHash = await bcrypt.hash(password, 10); // returns a promise
         console.log(passwordHash)
 
-
-
-
         const user = new User({ firstName, lastName, email, password: passwordHash });
         // const {firstName , lastName, email, password} = req.body;
 
@@ -36,6 +34,34 @@ app.post("/signup", async (req, res) => {
 
     } catch (error) {
         res.status(404).send("Error in creating the user: " + error.message)
+    }
+})
+
+app.post("/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Validate email using validator library
+        if (!validator.isEmail(email)) {
+            throw new Error("Email is not valid")
+        }
+
+        // find the user using email
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
+            throw new Error("Invalid Credentials");
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (isPasswordValid) {
+            res.send("Login Successfull !!!")
+        } else {
+            throw new Error("Invalid Credentials");
+        }
+    } catch (error) {
+        res.status(404).send("Error: " + error.message)
     }
 })
 
