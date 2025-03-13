@@ -10,6 +10,7 @@ import jwt from "jsonwebtoken"
 import cookieParser from "cookie-parser"
 import { userAuth } from "./utils/validation.js"
 
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 
@@ -59,13 +60,12 @@ app.post("/login", async (req, res) => {
             throw new Error("Invalid Credentials");
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await user.validatePassword(password);
 
         if (isPasswordValid) {
 
             // Create a JWT Token
-            const token = await jwt.sign({ _id: user._id }, "DevConenect@123", { expiresIn: '1d' });
-
+            const token = await user.getJWT();
 
 
             // Add the token to the cookie and send the response back to the user means the user is allready authenticated JWT is a tempoaray password
