@@ -6,11 +6,15 @@ import User from "./models/user.models.js";
 import { validateSignupData } from "./utils/validation.js";
 import bcrypt from "bcrypt"
 import validator from "validator"
+import jwt from "jsonwebtoken"
+import cookieParser from "cookie-parser"
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Third Party Middlewares
 app.use(express.json())
+app.use(cookieParser())
 
 app.post("/signup", async (req, res) => {
 
@@ -37,6 +41,7 @@ app.post("/signup", async (req, res) => {
     }
 })
 
+// Login API
 app.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -56,13 +61,53 @@ app.post("/login", async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (isPasswordValid) {
-            res.send("Login Successfull !!!")
+
+            // Create a JWT Token
+            const token = await jwt.sign({ _id: user._id }, "DevConenect@123");
+
+
+
+            // Add the token to the cookie and send the response back to the user means the user is allready authenticated JWT is a tempoaray password
+            res.cookie("token", token);
+            res.json({
+                message: "Logged in Successfully",
+                user: user,
+            });
         } else {
             throw new Error("Invalid Credentials");
         }
     } catch (error) {
         res.status(404).send("Error: " + error.message)
     }
+})
+
+// Get API Call using cookies /profile
+app.get("/profile", async (req, res) => {
+try {
+        const cookies = req.cookies;
+    
+        // Validate the token
+        const { token } = cookies;
+        if(!token) {
+            throw new Error("Invalid Token")
+        }
+    
+        const decodedMessage = await jwt.verify(token, "DevConenect@123");
+        // console.log(decodedMessage);
+    
+        const { _id } = decodedMessage;
+        // console.log("Logged in user: " + _id);
+    
+        // now fetch the user from the _id
+        const user  = await User.findById({_id})
+
+        if(!user) {
+            throw new Error("User not found");
+        }
+        res.json({user: user});
+} catch (error) {
+    res.status(404).send("Error: " + error.message)
+}
 })
 
 // find the user by email
@@ -132,7 +177,6 @@ app.delete("/user/:id", async (req, res) => {
 
 
 // Update API
-
 app.patch("/user", async (req, res) => {
     const userId = req.body.userId;
     const data = req.body;
@@ -172,6 +216,8 @@ app.patch("/user/:id", async (req, res) => {
         res.status(500).send("Update API FAILED: " + error.message);
     }
 })
+
+
 
 
 
