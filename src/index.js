@@ -8,6 +8,7 @@ import bcrypt from "bcrypt"
 import validator from "validator"
 import jwt from "jsonwebtoken"
 import cookieParser from "cookie-parser"
+import { userAuth } from "./utils/validation.js"
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -63,12 +64,12 @@ app.post("/login", async (req, res) => {
         if (isPasswordValid) {
 
             // Create a JWT Token
-            const token = await jwt.sign({ _id: user._id }, "DevConenect@123");
+            const token = await jwt.sign({ _id: user._id }, "DevConenect@123", { expiresIn: '1d' });
 
 
 
             // Add the token to the cookie and send the response back to the user means the user is allready authenticated JWT is a tempoaray password
-            res.cookie("token", token);
+            res.cookie("token", token, { expires: new Date(Date.now() + 8 * 3600000) });
             res.json({
                 message: "Logged in Successfully",
                 user: user,
@@ -82,32 +83,22 @@ app.post("/login", async (req, res) => {
 })
 
 // Get API Call using cookies /profile
-app.get("/profile", async (req, res) => {
-try {
-        const cookies = req.cookies;
-    
-        // Validate the token
-        const { token } = cookies;
-        if(!token) {
-            throw new Error("Invalid Token")
-        }
-    
-        const decodedMessage = await jwt.verify(token, "DevConenect@123");
-        // console.log(decodedMessage);
-    
-        const { _id } = decodedMessage;
-        // console.log("Logged in user: " + _id);
-    
-        // now fetch the user from the _id
-        const user  = await User.findById({_id})
+app.get("/profile", userAuth, async (req, res) => {
+    try {
+        const user = req.user;
 
-        if(!user) {
-            throw new Error("User not found");
-        }
-        res.json({user: user});
-} catch (error) {
-    res.status(404).send("Error: " + error.message)
-}
+        res.json({ user: user });
+    } catch (error) {
+        res.status(404).send("Error: " + error.message)
+    }
+})
+
+// Sending Connection Request
+app.post("/sendingConnectionRequest", userAuth, (req, res) => {
+
+    const user = req.user;
+
+    res.send(user.firstName + " sent the connection request");
 })
 
 // find the user by email
