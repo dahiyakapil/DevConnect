@@ -2,10 +2,7 @@ import dotenv from "dotenv"
 dotenv.config()
 import express from "express";
 import { connectDB } from "./config/connectDB.js";
-
 import cookieParser from "cookie-parser"
-
-
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -22,16 +19,6 @@ import requestRouter from "./routes/request.route.js"
 app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
 app.use("/request", requestRouter);
-
-
-
-
-
-
-
-
-
-
 
 connectDB()
     .then(() => {

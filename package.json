@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/nidex.js",
-    "server": "nodemon src/index.js",
+    "serve": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

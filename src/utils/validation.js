@@ -38,3 +38,19 @@ export const userAuth = async(req, res, next) => {
     res.status(400).send("Error: " + error.message)
    }
 }
+
+export const validateProfileEditData = (req) => {
+    try {
+        // Allowed fields for editing (No password here!)
+        const allowedEditFields = ["firstName", "lastName", "age", "gender", "skills", "about", "photoUrl"];
+
+        // Check if ALL fields are in allowedEditFields
+        const isEditAllowed = Object.keys(req.body).every((field) =>
+            allowedEditFields.includes(field)
+        );
+
+        return isEditAllowed;
+    } catch (error) {
+        console.error("Validation Error: ", error.message);
+    }
+};
