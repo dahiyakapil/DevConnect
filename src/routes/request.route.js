@@ -1,13 +1,13 @@
 import express from "express"
 const requestRouter = express.Router()
-import { userAuth } from "../utils/validation.js"
+import { userAuth } from "../middlewares/userAuthMiddleware.js"
 import ConnectionRequest from "../models/connectionRequest.model.js";
 import User from "../models/user.models.js";
 
 
 
 requestRouter.post(
-    "/send/:status/:toUserId", userAuth, async (req, res) => {
+    "/send/:status/:toUserId", userAuth, async (req, res, next) => {
         try {
             const fromUserId = req.user._id;
             const toUserId = req.params.toUserId;
@@ -19,7 +19,7 @@ requestRouter.post(
                 return res.status(400).json({ message: "Invalid status type: " + status })
             }
 
-            
+
 
             const toUser = await User.findOne({ _id: toUserId });
 
@@ -53,7 +53,43 @@ requestRouter.post(
                 data
             })
         } catch (error) {
-            res.status(404).send("Error: " + error.message)
+            next(error)
+        }
+    }
+)
+
+requestRouter.post("/review/:status/:requestId", userAuth,
+    async (req, res) => {
+        try {
+            const loggedInUser = req.user;
+            console.log(loggedInUser)
+            const { status, requestId } = req.params;
+
+            const allowedStatus = ["accepted", "rejected"]
+
+            if (!allowedStatus.includes(status)) {
+                return res.status(400).json({ message: "Status not allowed" });
+            }
+
+            const connectionRequest = await ConnectionRequest.findOne({
+                _id: requestId,
+                toUserId: loggedInUser._id,
+                status: "interested"
+            })
+
+            if (!connectionRequest) {
+                return res.status(400).json({ message: "Connection request not found" })
+            }
+
+            connectionRequest.status = status;
+
+            const data = await connectionRequest.save();
+
+            res.json({ message: "Connection request" + status, data });
+
+
+        } catch (error) {
+            res.status(500).json({ message: "Internal Server Error", error: error.message });
         }
     }
 )

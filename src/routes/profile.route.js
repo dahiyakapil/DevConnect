@@ -2,7 +2,8 @@
 
 import express from "express"
 const prodfileRouter = express.Router();
-import { userAuth, validateProfileEditData } from "../utils/validation.js"
+import {validateProfileEditData } from "../utils/validation.js"
+import {userAuth} from "../middlewares/userAuthMiddleware.js"
 
 prodfileRouter.get("/view", userAuth, async (req, res) => {
     try {
