@@ -1,5 +1,6 @@
 import dotenv from "dotenv"
 dotenv.config()
+import cors from "cors"
 import express from "express";
 import { connectDB } from "./config/connectDB.js";
 import cookieParser from "cookie-parser"
@@ -10,6 +11,12 @@ const PORT = process.env.PORT || 4000;
 // Middlewares
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors(
+    {
+        origin: "http://localhost:5173",
+        credentials: true
+    }
+))
 
 
 import authRouter from "./routes/auth.route.js"
