@@ -25,7 +25,7 @@ import requestRouter from "./routes/request.route.js"
 import userRouter from "./routes/user.route.js";
 
 
-app.use("/", (res, res) => {
+app.use("/", (req, res) => {
     res.send("Dev Connect Backend is running....")
 })
 
