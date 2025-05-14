@@ -24,6 +24,11 @@ import profileRouter from "./routes/profile.route.js"
 import requestRouter from "./routes/request.route.js"
 import userRouter from "./routes/user.route.js";
 
+
+app.use("/", (res, res) => {
+    res.send("Dev Connect Backend is running....")
+})
+
 app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
 app.use("/request", requestRouter);
