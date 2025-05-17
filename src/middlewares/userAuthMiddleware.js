@@ -37,22 +37,22 @@ export const userAuth = async (req, res, next) => {
     const { token } = req.cookies;
 
     if (!token) {
-      return res.status(401).send("Please Login"); // ✅ return added
+      return res.status(401).send("Please Login"); 
     }
 
-    const decodedData = jwt.verify(token, "DevConenect@123");
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
     const { _id } = decodedData;
 
     const user = await User.findById(_id);
 
     if (!user) {
-      return res.status(404).send("User not found"); // ✅ return for safety
+      return res.status(404).send("User not found"); 
     }
 
     req.user = user;
-    next(); // ✅ only reaches here if everything is valid
+    next(); 
 
   } catch (error) {
-    return res.status(400).send("Error: " + error.message); // ✅ ensure single response
+    return res.status(400).send("Error: " + error.message); 
   }
 };

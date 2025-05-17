@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 
-export const connectDB = async () => {
 
+export const connectDB = async () => {
     const str = "mongodb+srv://kapil:HMyG4pUAob5RSDew@devconnect.2ahsn.mongodb.net/?retryWrites=true&w=majority&appName=devConnect";
     try {
         const connectionInstance = await mongoose.connect(str);
