@@ -5,6 +5,10 @@ import express from "express";
 import { connectDB } from "./config/connectDB.js";
 import cookieParser from "cookie-parser"
 
+
+import "./utils/cronjob.js";
+
+
 const app = express();
 const PORT =  process.env.PORT || 5000;
 

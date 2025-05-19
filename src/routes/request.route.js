@@ -4,7 +4,7 @@ import { userAuth } from "../middlewares/userAuthMiddleware.js"
 import ConnectionRequest from "../models/connectionRequest.model.js";
 import User from "../models/user.models.js";
 
-
+import { sendEmail } from "../utils/SendEmail/sendEmail.js"
 
 requestRouter.post(
     "/send/:status/:toUserId", userAuth, async (req, res, next) => {
@@ -48,6 +48,16 @@ requestRouter.post(
 
             const data = await connectionRequest.save();
 
+            const emailRes = await sendEmail(
+                "kapildahiya308@gmail.com", // receiver (replace with `toUser.email` if available)
+                "kapil@devconnect.biz",     // sender
+                "New Connection Request on DevConnect",
+                `<h1>DevConnect Invitation</h1><p>You have a new connection request on DevConnect. Log in to respond.</p>`,
+                "You have a new connection request on DevConnect."
+            );
+
+
+
             res.json({
                 message: `You have successfully marked the user as "${status}"`,
                 data
@@ -62,7 +72,7 @@ requestRouter.post("/review/:status/:requestId", userAuth,
     async (req, res) => {
         try {
             const loggedInUser = req.user;
-            
+
             const { status, requestId } = req.params;
 
             const allowedStatus = ["accepted", "rejected"]
